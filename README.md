@@ -1,6 +1,16 @@
-# Multilingual Farmer Assistant
+# KrishiGPT
 
 A comprehensive AI-powered assistant designed to help farmers with agricultural information and weather forecasts in multiple Indian languages.
+
+## Project Demo
+
+https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
+
+## Flow of Events
+![Image](https://github.com/user-attachments/assets/94e8da1b-c417-4bf1-9c0c-81fec31ee56c)
+
+## Agent Architechture 
+![Image](https://github.com/user-attachments/assets/0b52ad16-c25c-4736-ab20-5f4d1dc2681b)
 
 ## 🌟 Features
 
@@ -70,7 +80,15 @@ print(response)
 # Ask about farming in Hindi
 response = call_agent("मुझे फसलों की सिंचाई के बारे में जानकारी चाहिए")
 print(response)
+
 ```
+### Web usage - ADK web
+
+1. Enter the following command in the terminal, this will open up a UI interface where the queries can be directly asked to the Agent
+```bash
+adk web
+```
+
 
 ### Example Queries
 
