@@ -2,16 +2,6 @@
 
 A comprehensive AI-powered assistant designed to help farmers with agricultural information and weather forecasts in multiple Indian languages.
 
-## Project Demo
-
-https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
-
-## Flow of Events
-![Image](https://github.com/user-attachments/assets/94e8da1b-c417-4bf1-9c0c-81fec31ee56c)
-
-## Agent Architechture 
-![Image](https://github.com/user-attachments/assets/0b52ad16-c25c-4736-ab20-5f4d1dc2681b)
-
 ## Features
 
 - **Multilingual Support**: Understands and responds in 11 Indian languages
@@ -39,8 +29,10 @@ https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
 
 - **Google ADK**: For building the agent pipeline
 - **Google Gemini**: For language understanding and generation
-- **SarvamAI**: For specialized agricultural knowledge and Indian language translation
+- **SarvamAI**: For specialized indic knowledge and Indian language translation
 - **OpenWeatherMap API**: For weather forecasts
+- **moSOPI MCP**: For goverment statistical data
+- **Mandi API**: For real time accurate commodity prices
 - **Python**: Core programming language
 
 ## Project Structure
@@ -51,25 +43,27 @@ https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
 │       ├── agents
 │       │   ├── __init__.py
 │       │   ├── farming_agent.py
+│       │   ├── market_agent.py
 │       │   ├── translation_agent.py
 │       │   └── weather_agent.py
 │       ├── tools
 │       │   ├── __init__.py
 │       │   ├── location.py
+│       │   ├── market.py
 │       │   ├── sarvam.py
 │       │   ├── translation.py
 │       │   └── weather.py
 │       ├── __init__.py
 │       ├── __main__.py
 │       ├── agent.py
-│       └── config.py
+│       ├── config.py
+│       └── evalset03ac12.evalset.json
 ├── .gitignore
 ├── LICENSE
 ├── README.md
 ├── __init__.py
 ├── agent.py
 ├── env.example
-├── mcpdocs.md
 ├── pyproject.toml
 └── requirements.txt
 ```
@@ -112,7 +106,7 @@ https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
 from krishigpt.agent import call_agent
 
 # Ask about weather in English
-response = call_agent("What's the weather like in Mumbai today?")
+response = call_agent("Which vegetable increased by more than 20% compared to last year ?")
 print(response)
 
 # Ask about farming in Hindi
@@ -148,19 +142,16 @@ Then select the `krishigpt` app in the UI.
 - "ಕರ್ನಾಟಕದಲ್ಲಿ ರಾಗಿ ಬೆಳೆಯಲು ಯಾವ ಮಣ್ಣು ಉತ್ತಮ?" (Which soil is best for growing ragi in Karnataka?)
 
 #### Government Data Queries:
-- "What is the latest CPI for India?"
-- "Show PLFS unemployment rate for 2023."
-- "Find the IIP growth for manufacturing in 2024."
+- "Which vegetable increased by more than 20% compared to last year ?"
+- "What is the wholesale price index of wheat in the latest year?"
+- "எந்த பருப்பு வகைகளின் விலை மிக அதிகமாக வளர்ச்சி அடைந்துள்ளது?" (Which pulses have seen the highest growth in price?)
 
-## System Architecture
+### Commodity / Mandi Price Queries
 
-The system uses a translation sandwich around an on-demand coordinator:
+- “What is the current mandi price of onions in Maharashtra?”
+- “What's the soybean prices in Madhya Pradesh mandis.”
+- "હાલ ઘઉં માટે કયું રાજ્ય સૌથી વધુ MSP કિંમત ઓફર કરી રહ્યું છે?" (Which state is offering the highest MSP price for wheat currently?)
 
-1. **Input Translation Agent**: Detects user language and translates the query to English.
-2. **Coordinator Agent**: Routes to a specialist on demand (no tool calls directly).
-3. **Weather Agent** (on demand): Extracts location and fetches forecast.
-4. **Farming Agent** (on demand): Uses SarvamAI for agricultural information.
-5. **Output Translation Agent**: Translates the English response back to the user's language.
 
 ## API Keys
 
@@ -182,13 +173,3 @@ This project requires two API keys:
    - Set `MOSPI_MCP_URL` to the MoSPI MCP endpoint
 
 > **Note**: `env.example` is included as a template for required environment variables.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgements
-
-- [Google ADK](https://github.com/google/agents-sdk) for the agent framework
-- [SarvamAI](https://www.sarvam.ai/) for translation and agricultural knowledge
-- [OpenWeatherMap](https://openweathermap.org/) for weather data 
