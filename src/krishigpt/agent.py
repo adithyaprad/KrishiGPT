@@ -10,6 +10,7 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
 from .agents.farming_agent import create_farming_agent
+from .agents.market_agent import create_market_agent
 from .agents.translation_agent import (
     create_input_translation_agent,
     create_output_translation_agent,
@@ -50,6 +51,7 @@ def build_pipeline(model: Optional[str] = None) -> SequentialAgent:
     input_translation_agent = create_input_translation_agent(model=gemini_model)
     weather_agent = create_weather_agent(model=gemini_model)
     farming_agent = create_farming_agent(model=gemini_model)
+    market_agent = create_market_agent(model=gemini_model)
     output_translation_agent = create_output_translation_agent(model=gemini_model)
 
     coordinator_agent = LlmAgent(
@@ -63,12 +65,17 @@ If translation_result is missing, use the user's original query.
 
 Decide which specialist should handle the user query:
 - WeatherAgent: weather, temperature, rain, forecast, humidity, wind, climate.
+- MarketAgent: mandi prices, market rates, APMC prices, commodity price by
+  state/district/market, or "today's price" queries.
 - FarmingAgent: crops, pests, soil, irrigation, fertilizer, equipment, practices,
   government statistics, official surveys, CPI/WPI/IIP, PLFS, NAS, ASI,
   environmental statistics, or MoSPI datasets.
 
 If the query is weather-related, call:
 transfer_to_agent(agent_name="WeatherAgent")
+
+If the query is about mandi or market prices, call:
+transfer_to_agent(agent_name="MarketAgent")
 
 If the query is farming-related, call:
 transfer_to_agent(agent_name="FarmingAgent")
@@ -77,7 +84,7 @@ If the intent is unclear, ask a short clarification question in English and do n
 
 Do not answer weather, farming, or government-data queries directly; always delegate to a specialist.
 """,
-        sub_agents=[weather_agent, farming_agent],
+        sub_agents=[weather_agent, market_agent, farming_agent],
         output_key="coordinator_message",
     )
 
