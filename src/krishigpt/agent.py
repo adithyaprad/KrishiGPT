@@ -11,6 +11,7 @@ from google.adk.tools import FunctionTool
 from google.genai import types
 
 from .agents.response_agent import create_response_agent
+from .agents.router_agent import create_router_agent
 from .config import DEFAULT_APP_NAME, configure_google_api, get_gemini_model
 from .tools.translation import translate_text
 
@@ -19,20 +20,6 @@ logger = logging.getLogger(__name__)
 APP_NAME = DEFAULT_APP_NAME
 DEFAULT_USER_ID = "user_01"
 DEFAULT_SESSION_ID = "translation_session_01"
-
-LANGUAGE_NAMES = {
-    "en-IN": "English",
-    "hi-IN": "Hindi",
-    "bn-IN": "Bengali",
-    "gu-IN": "Gujarati",
-    "kn-IN": "Kannada",
-    "ml-IN": "Malayalam",
-    "mr-IN": "Marathi",
-    "od-IN": "Odia",
-    "pa-IN": "Punjabi",
-    "ta-IN": "Tamil",
-    "te-IN": "Telugu",
-}
 
 _runner: Optional[Runner] = None
 _session_service: Optional[InMemorySessionService] = None
@@ -103,12 +90,22 @@ translate_text(
 )
 
 If the query is already in English (detected_language is 'en-IN'), still use the translation tool for consistency.
+
+The translation tool returns a JSON object with fields like:
+- status: "success" or "error"
+- translated_text: the translated string
+- error_message: optional error details
+
+If status is "success", output only translated_text.
+If status is "error", output the original user query as-is.
 Output only the translated text without additional explanations.
 """,
         description="Translates user queries to English using the translation tool.",
         tools=[translation_tool],
         output_key="translated_query",
     )
+
+    routing_agent = create_router_agent(model=gemini_model)
 
     response_agent = create_response_agent(model=gemini_model)
 
@@ -131,7 +128,14 @@ translate_text(
     mode="classic-colloquial"
 )
 
+The translation tool returns a JSON object with fields like:
+- status: "success" or "error"
+- translated_text: the translated string
+- error_message: optional error details
+
 If the original language was English (detected_language is 'en-IN'), just return the English response as is.
+If status is "success", output only translated_text.
+If status is "error", return the English response as-is.
 Output only the translated response without additional explanations.
 """,
         description="Translates the English response back to the user's original language.",
@@ -144,6 +148,7 @@ Output only the translated response without additional explanations.
         sub_agents=[
             language_detection_agent,
             translation_agent,
+            routing_agent,
             response_agent,
             final_response_agent,
         ],
@@ -212,27 +217,19 @@ def call_agent(
 
 
 def _format_response(responses: Dict[str, str]) -> str:
-    formatted_response = []
-
-    language_code = responses.get("detected_language")
-    if language_code:
-        language_name = LANGUAGE_NAMES.get(language_code, language_code)
-        formatted_response.append(
-            f"Detected Language: {language_name} ({language_code})"
-        )
+    final_response = responses.get("final_response")
+    if final_response:
+        return final_response
 
     english_response = responses.get("english_response")
     if english_response:
-        formatted_response.append(f"\nEnglish Response:\n{english_response}")
+        return english_response
 
-    final_response = responses.get("final_response")
-    if final_response and language_code and language_code != "en-IN":
-        language_name = LANGUAGE_NAMES.get(language_code, language_code)
-        formatted_response.append(
-            f"\n{language_name} Response:\n{final_response}"
-        )
+    translated_query = responses.get("translated_query")
+    if translated_query:
+        return translated_query
 
-    return "\n".join(formatted_response)
+    return "I'm sorry, I couldn't process that request. Please try again."
 
 
 def test_pipeline() -> None:
