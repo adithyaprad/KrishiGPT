@@ -17,6 +17,7 @@ https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
 - **Multilingual Support**: Understands and responds in 11 Indian languages
 - **Weather Information**: Provides detailed weather forecasts for any location
 - **Agricultural Knowledge**: Offers farming advice, crop management techniques, and more
+- **Government Statistics**: Fetches official MoSPI datasets via MCP tools
 - **Natural Language Processing**: Understands queries in natural language
 - **Seamless Translation**: Automatically detects language and translates responses
 
@@ -49,7 +50,9 @@ https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
 │   └── krishigpt
 │       ├── agents
 │       │   ├── __init__.py
-│       │   └── response_agent.py
+│       │   ├── farming_agent.py
+│       │   ├── translation_agent.py
+│       │   └── weather_agent.py
 │       ├── tools
 │       │   ├── __init__.py
 │       │   ├── location.py
@@ -98,6 +101,7 @@ https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
    GOOGLE_API_KEY=your_google_api_key_here
    SARVAM_API_KEY=your_sarvam_api_key_here
    OPENWEATHER_API_KEY=your_openweather_api_key_here
+   MOSPI_MCP_URL=https://mcp.mospi.gov.in
    ```
 
 ## Usage
@@ -143,18 +147,20 @@ Then select the `krishigpt` app in the UI.
 - "Best time to plant wheat in Punjab?"
 - "ಕರ್ನಾಟಕದಲ್ಲಿ ರಾಗಿ ಬೆಳೆಯಲು ಯಾವ ಮಣ್ಣು ಉತ್ತಮ?" (Which soil is best for growing ragi in Karnataka?)
 
+#### Government Data Queries:
+- "What is the latest CPI for India?"
+- "Show PLFS unemployment rate for 2023."
+- "Find the IIP growth for manufacturing in 2024."
+
 ## System Architecture
 
-The system uses a sequential pipeline of specialized agents:
+The system uses a translation sandwich around an on-demand coordinator:
 
-1. **Language Detection Agent**: Identifies the language of the user's query
-2. **Translation Agent**: Translates the query to English
-3. **Response Router Agent**: 
-   - Analyzes if the query is about weather or farming
-   - Routes to appropriate specialized agent
-4. **Weather Agent**: For weather queries, extracts location and fetches forecast
-5. **Farming Agent**: For farming queries, uses SarvamAI to provide agricultural information
-6. **Final Response Agent**: Translates the response back to the user's original language
+1. **Input Translation Agent**: Detects user language and translates the query to English.
+2. **Coordinator Agent**: Routes to a specialist on demand (no tool calls directly).
+3. **Weather Agent** (on demand): Extracts location and fetches forecast.
+4. **Farming Agent** (on demand): Uses SarvamAI for agricultural information.
+5. **Output Translation Agent**: Translates the English response back to the user's language.
 
 ## API Keys
 
@@ -171,6 +177,9 @@ This project requires two API keys:
 3. **OpenWeatherMap API Key**: For weather forecasts
    - Sign up at [OpenWeatherMap](https://openweathermap.org/api)
    - Create an API key and add it to your `.env` file
+
+4. **MoSPI MCP (optional)**: For government statistics via MCP
+   - Set `MOSPI_MCP_URL` to the MoSPI MCP endpoint
 
 > **Note**: `env.example` is included as a template for required environment variables.
 

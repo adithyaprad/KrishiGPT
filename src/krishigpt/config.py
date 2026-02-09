@@ -37,8 +37,9 @@ def get_env(name: str, default: Optional[str] = None) -> Optional[str]:
     return _ENV_VALUES.get(name, default)
 
 
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash-lite"
+DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 DEFAULT_APP_NAME = "translator_assistant_app"
+DEFAULT_MOSPI_MCP_URL = "https://mcp.mospi.gov.in"
 
 
 def get_gemini_model() -> str:
@@ -55,6 +56,10 @@ def get_sarvam_api_key() -> Optional[str]:
 
 def get_google_api_key() -> Optional[str]:
     return get_env("GOOGLE_API_KEY")
+
+
+def get_mospi_mcp_url() -> str:
+    return get_env("MOSPI_MCP_URL", DEFAULT_MOSPI_MCP_URL) or DEFAULT_MOSPI_MCP_URL
 
 
 def configure_google_api() -> None:

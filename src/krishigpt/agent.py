@@ -63,7 +63,9 @@ If translation_result is missing, use the user's original query.
 
 Decide which specialist should handle the user query:
 - WeatherAgent: weather, temperature, rain, forecast, humidity, wind, climate.
-- FarmingAgent: crops, pests, soil, irrigation, fertilizer, equipment, practices.
+- FarmingAgent: crops, pests, soil, irrigation, fertilizer, equipment, practices,
+  government statistics, official surveys, CPI/WPI/IIP, PLFS, NAS, ASI,
+  environmental statistics, or MoSPI datasets.
 
 If the query is weather-related, call:
 transfer_to_agent(agent_name="WeatherAgent")
@@ -73,7 +75,7 @@ transfer_to_agent(agent_name="FarmingAgent")
 
 If the intent is unclear, ask a short clarification question in English and do not call any tools.
 
-Do not answer weather or farming queries directly; always delegate to a specialist.
+Do not answer weather, farming, or government-data queries directly; always delegate to a specialist.
 """,
         sub_agents=[weather_agent, farming_agent],
         output_key="coordinator_message",

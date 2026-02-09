@@ -1,0 +1,25 @@
+{
+  "eval_set_id": "evalset03ac12",
+  "name": "evalset03ac12",
+  "eval_cases": [
+    {
+      "eval_id": "case7b68d7",
+      "conversation": [],
+      "session_input": {
+        "app_name": "krishigpt",
+        "user_id": "user"
+      },
+      "creation_timestamp": 1770655810.7332916
+    },
+    {
+      "eval_id": "case25cd34",
+      "conversation": [],
+      "session_input": {
+        "app_name": "krishigpt",
+        "user_id": "user"
+      },
+      "creation_timestamp": 1770655818.2334182
+    }
+  ],
+  "creation_timestamp": 1770655807.7680173
+}
