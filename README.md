@@ -1,6 +1,6 @@
 # KrishiGPT
 
-A comprehensive AI-powered assistant designed to help farmers with agricultural information and weather forecasts in multiple Indian languages.
+A comprehensive AI-powered assistant designed to help farmers with agricultural information based on weather forcasts, government statistics, and prices of various commodities .
 
 ## Features
 
