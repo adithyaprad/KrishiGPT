@@ -51,7 +51,6 @@ https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
 │       ├── agents
 │       │   ├── __init__.py
 │       │   ├── farming_agent.py
-│       │   ├── government_agent.py
 │       │   ├── translation_agent.py
 │       │   └── weather_agent.py
 │       ├── tools
@@ -103,7 +102,6 @@ https://github.com/user-attachments/assets/acb3e669-224a-43d5-ac9b-852304626ea3
    SARVAM_API_KEY=your_sarvam_api_key_here
    OPENWEATHER_API_KEY=your_openweather_api_key_here
    MOSPI_MCP_URL=https://mcp.mospi.gov.in
-   MOSPI_MCP_AUTH_TOKEN=
    ```
 
 ## Usage
@@ -182,7 +180,6 @@ This project requires two API keys:
 
 4. **MoSPI MCP (optional)**: For government statistics via MCP
    - Set `MOSPI_MCP_URL` to the MoSPI MCP endpoint
-   - If required by the server, set `MOSPI_MCP_AUTH_TOKEN`
 
 > **Note**: `env.example` is included as a template for required environment variables.
 

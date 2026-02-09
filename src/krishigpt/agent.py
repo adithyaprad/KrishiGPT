@@ -10,7 +10,6 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
 from .agents.farming_agent import create_farming_agent
-from .agents.government_agent import create_government_data_agent
 from .agents.translation_agent import (
     create_input_translation_agent,
     create_output_translation_agent,
@@ -51,7 +50,6 @@ def build_pipeline(model: Optional[str] = None) -> SequentialAgent:
     input_translation_agent = create_input_translation_agent(model=gemini_model)
     weather_agent = create_weather_agent(model=gemini_model)
     farming_agent = create_farming_agent(model=gemini_model)
-    government_agent = create_government_data_agent(model=gemini_model)
     output_translation_agent = create_output_translation_agent(model=gemini_model)
 
     coordinator_agent = LlmAgent(
@@ -65,9 +63,9 @@ If translation_result is missing, use the user's original query.
 
 Decide which specialist should handle the user query:
 - WeatherAgent: weather, temperature, rain, forecast, humidity, wind, climate.
-- FarmingAgent: crops, pests, soil, irrigation, fertilizer, equipment, practices.
-- GovernmentDataAgent: government statistics, official surveys, CPI/WPI/IIP,
-  PLFS, NAS, ASI, environmental statistics, or MoSPI datasets.
+- FarmingAgent: crops, pests, soil, irrigation, fertilizer, equipment, practices,
+  government statistics, official surveys, CPI/WPI/IIP, PLFS, NAS, ASI,
+  environmental statistics, or MoSPI datasets.
 
 If the query is weather-related, call:
 transfer_to_agent(agent_name="WeatherAgent")
@@ -75,14 +73,11 @@ transfer_to_agent(agent_name="WeatherAgent")
 If the query is farming-related, call:
 transfer_to_agent(agent_name="FarmingAgent")
 
-If the query is government-data related, call:
-transfer_to_agent(agent_name="GovernmentDataAgent")
-
 If the intent is unclear, ask a short clarification question in English and do not call any tools.
 
-Do not answer weather or farming queries directly; always delegate to a specialist.
+Do not answer weather, farming, or government-data queries directly; always delegate to a specialist.
 """,
-        sub_agents=[weather_agent, farming_agent, government_agent],
+        sub_agents=[weather_agent, farming_agent],
         output_key="coordinator_message",
     )
 
