@@ -6,7 +6,7 @@ from google.adk.tools import FunctionTool
 from ..tools.translation import translate_text_if_needed
 
 
-def create_input_translation_agent(model: str = "gemini-2.0-flash-lite") -> LlmAgent:
+def create_input_translation_agent(model: str = "gemini-2.5-flash-lite") -> LlmAgent:
     """
     Detect language and translate the user query to English.
     """
@@ -44,7 +44,7 @@ Output ONLY this JSON (no extra text):
     )
 
 
-def create_output_translation_agent(model: str = "gemini-2.0-flash-lite") -> LlmAgent:
+def create_output_translation_agent(model: str = "gemini-2.5-flash-lite") -> LlmAgent:
     """
     Translate the English response back to the user's language.
     """

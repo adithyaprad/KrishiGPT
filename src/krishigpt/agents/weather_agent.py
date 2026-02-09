@@ -7,7 +7,7 @@ from ..tools.location import get_lat_lon
 from ..tools.weather import get_weather_forecast
 
 
-def create_weather_agent(model: str = "gemini-2.0-flash-lite") -> LlmAgent:
+def create_weather_agent(model: str = "gemini-2.5-flash-lite") -> LlmAgent:
     """
     Weather specialist that handles weather queries in English.
     """

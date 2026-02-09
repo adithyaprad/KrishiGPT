@@ -6,7 +6,7 @@ from google.adk.tools import FunctionTool
 from ..tools.sarvam import use_sarvam_llm
 
 
-def create_farming_agent(model: str = "gemini-2.0-flash-lite") -> LlmAgent:
+def create_farming_agent(model: str = "gemini-2.5-flash-lite") -> LlmAgent:
     """
     Farming specialist that handles agricultural queries in English.
     """
