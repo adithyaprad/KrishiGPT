@@ -54,6 +54,10 @@ def get_sarvam_api_key() -> Optional[str]:
     return get_env("SARVAM_API_KEY")
 
 
+def get_mandi_api_key() -> Optional[str]:
+    return get_env("MANDI_API_KEY")
+
+
 def get_google_api_key() -> Optional[str]:
     return get_env("GOOGLE_API_KEY")
 
