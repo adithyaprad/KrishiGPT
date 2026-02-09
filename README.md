@@ -8,7 +8,7 @@ A comprehensive AI-powered assistant designed to help farmers with agricultural 
 - **Weather Information**: Provides detailed weather forecasts for any location
 - **Agricultural Knowledge**: Offers farming advice, crop management techniques, and more
 - **Government Statistics**: Fetches official MoSPI datasets via MCP tools
-- **Natural Language Processing**: Understands queries in natural language
+- **Mandi Prices**: Fetches realtime commodity prices
 - **Seamless Translation**: Automatically detects language and translates responses
 
 ## Supported Languages
