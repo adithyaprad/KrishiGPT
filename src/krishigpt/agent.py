@@ -7,13 +7,15 @@ from google.adk.agents.llm_agent import LlmAgent
 from google.adk.agents.sequential_agent import SequentialAgent
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
-from google.adk.tools import FunctionTool
 from google.genai import types
 
-from .agents.response_agent import create_response_agent
-from .agents.router_agent import create_router_agent
+from .agents.farming_agent import create_farming_agent
+from .agents.translation_agent import (
+    create_input_translation_agent,
+    create_output_translation_agent,
+)
+from .agents.weather_agent import create_weather_agent
 from .config import DEFAULT_APP_NAME, configure_google_api, get_gemini_model
-from .tools.translation import translate_text
 
 logger = logging.getLogger(__name__)
 
@@ -41,116 +43,48 @@ def _extract_event_text(event: Any) -> Optional[str]:
 
 def build_pipeline(model: Optional[str] = None) -> SequentialAgent:
     """
-    Build the multilingual farmer assistant pipeline.
+    Build the multilingual farmer assistant pipeline using on-demand subagents.
     """
     configure_google_api()
     gemini_model = model or get_gemini_model()
-    translation_tool = FunctionTool(func=translate_text)
+    input_translation_agent = create_input_translation_agent(model=gemini_model)
+    weather_agent = create_weather_agent(model=gemini_model)
+    farming_agent = create_farming_agent(model=gemini_model)
+    output_translation_agent = create_output_translation_agent(model=gemini_model)
 
-    language_detection_agent = LlmAgent(
-        name="LanguageDetectionAgent",
+    coordinator_agent = LlmAgent(
+        name="FarmerAssistantCoordinator",
         model=gemini_model,
-        instruction="""You are a Language Detection Agent.
-Your task is to identify which language the user's query is written in.
+        description="Routes farmer queries to specialist agents on demand.",
+        instruction="""You are the coordinator for a farmer assistant.
 
-Only consider the following language options:
-en-IN: English
-hi-IN: Hindi
-bn-IN: Bengali
-gu-IN: Gujarati
-kn-IN: Kannada
-ml-IN: Malayalam
-mr-IN: Marathi
-od-IN: Odia
-pa-IN: Punjabi
-ta-IN: Tamil
-te-IN: Telugu
+Use the English query from translation_result.translated_query in session state.
+If translation_result is missing, use the user's original query.
 
-Return ONLY the language code (e.g., "hi-IN", "en-IN", etc.) without any additional text or explanation.
-If you're unsure, default to "en-IN".
+Decide which specialist should handle the user query:
+- WeatherAgent: weather, temperature, rain, forecast, humidity, wind, climate.
+- FarmingAgent: crops, pests, soil, irrigation, fertilizer, equipment, practices.
+
+If the query is weather-related, call:
+transfer_to_agent(agent_name="WeatherAgent")
+
+If the query is farming-related, call:
+transfer_to_agent(agent_name="FarmingAgent")
+
+If the intent is unclear, ask a short clarification question in English and do not call any tools.
+
+Do not answer weather or farming queries directly; always delegate to a specialist.
 """,
-        description="Detects the language of the user's query.",
-        output_key="detected_language",
-    )
-
-    translation_agent = LlmAgent(
-        name="TranslationAgent",
-        model=gemini_model,
-        instruction="""You are a Translation Agent.
-Your task is to translate the user's query to English using the translation tool.
-Use the language code provided in the session state under the key 'detected_language' as the source_language_code parameter when calling the translation tool.
-Access the detected language code from the session state and pass it explicitly to the translation tool.
-
-For example, if the detected language is "hi-IN", you should call the translation tool with:
-translate_text(
-    text=user_query,
-    source_language_code="hi-IN",
-    speaker_gender="Male",
-    mode="classic-colloquial"
-)
-
-If the query is already in English (detected_language is 'en-IN'), still use the translation tool for consistency.
-
-The translation tool returns a JSON object with fields like:
-- status: "success" or "error"
-- translated_text: the translated string
-- error_message: optional error details
-
-If status is "success", output only translated_text.
-If status is "error", output the original user query as-is.
-Output only the translated text without additional explanations.
-""",
-        description="Translates user queries to English using the translation tool.",
-        tools=[translation_tool],
-        output_key="translated_query",
-    )
-
-    routing_agent = create_router_agent(model=gemini_model)
-
-    response_agent = create_response_agent(model=gemini_model)
-
-    final_response_agent = LlmAgent(
-        name="FinalResponseAgent",
-        model=gemini_model,
-        instruction="""You are a Translation Agent for responses.
-Your task is to translate the English response back to the user's original language.
-
-1. Get the English response from the session state under the key 'english_response'.
-2. Get the user's original language code from the session state under the key 'detected_language'.
-3. Use the translation tool to translate the response to the user's original language.
-
-For example, if the detected language is "hi-IN", you should call the translation tool with:
-translate_text(
-    text=english_response,
-    source_language_code="en-IN",
-    target_language_code="hi-IN",
-    speaker_gender="Male",
-    mode="classic-colloquial"
-)
-
-The translation tool returns a JSON object with fields like:
-- status: "success" or "error"
-- translated_text: the translated string
-- error_message: optional error details
-
-If the original language was English (detected_language is 'en-IN'), just return the English response as is.
-If status is "success", output only translated_text.
-If status is "error", return the English response as-is.
-Output only the translated response without additional explanations.
-""",
-        description="Translates the English response back to the user's original language.",
-        tools=[translation_tool],
-        output_key="final_response",
+        sub_agents=[weather_agent, farming_agent],
+        output_key="coordinator_message",
     )
 
     return SequentialAgent(
-        name="MultilingualFarmerAssistantPipeline",
+        name="FarmerAssistantPipeline",
         sub_agents=[
-            language_detection_agent,
-            translation_agent,
-            routing_agent,
-            response_agent,
-            final_response_agent,
+            input_translation_agent,
+            coordinator_agent,
+            output_translation_agent,
         ],
     )
 
@@ -224,6 +158,10 @@ def _format_response(responses: Dict[str, str]) -> str:
     english_response = responses.get("english_response")
     if english_response:
         return english_response
+
+    coordinator_message = responses.get("coordinator_message")
+    if coordinator_message:
+        return coordinator_message
 
     translated_query = responses.get("translated_query")
     if translated_query:
