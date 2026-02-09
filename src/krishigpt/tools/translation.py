@@ -41,3 +41,32 @@ def translate_text(
     except Exception as exc:
         logger.exception("Error translating text: %s", exc)
         return {"status": "error", "error_message": str(exc), "translated_text": ""}
+
+
+def translate_text_if_needed(
+    text: str,
+    source_language_code: str = "en-IN",
+    target_language_code: str = "en-IN",
+    speaker_gender: str = "Male",
+    mode: str = "classic-colloquial",
+) -> Dict[str, Any]:
+    """
+    Translate only when source and target languages differ.
+    """
+    if not text:
+        return {
+            "status": "error",
+            "error_message": "text is required",
+            "translated_text": "",
+        }
+
+    if source_language_code == target_language_code:
+        return {"status": "success", "translated_text": text, "skipped": True}
+
+    return translate_text(
+        text=text,
+        source_language_code=source_language_code,
+        target_language_code=target_language_code,
+        speaker_gender=speaker_gender,
+        mode=mode,
+    )
