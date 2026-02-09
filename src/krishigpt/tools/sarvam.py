@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 from openai import OpenAI
 
-from krishigpt.config import get_sarvam_api_key
+from ..config import get_sarvam_api_key
 
 logger = logging.getLogger(__name__)
 

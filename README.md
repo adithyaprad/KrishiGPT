@@ -124,10 +124,11 @@ python -m krishigpt
 ```
 ### Web usage - ADK web
 
-1. Enter the following command in the terminal, this will open up a UI interface where the queries can be directly asked to the Agent
+1. Run `adk web` from the project root and point it to the agents directory:
 ```bash
-adk web
+adk web src
 ```
+Then select the `krishigpt` app in the UI.
 
 
 ### Example Queries

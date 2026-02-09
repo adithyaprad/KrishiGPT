@@ -10,9 +10,9 @@ from google.adk.sessions import InMemorySessionService
 from google.adk.tools import FunctionTool
 from google.genai import types
 
-from krishigpt.agents.response_agent import create_response_agent
-from krishigpt.config import DEFAULT_APP_NAME, get_gemini_model
-from krishigpt.tools.translation import translate_text
+from .agents.response_agent import create_response_agent
+from .config import DEFAULT_APP_NAME, configure_google_api, get_gemini_model
+from .tools.translation import translate_text
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +56,7 @@ def build_pipeline(model: Optional[str] = None) -> SequentialAgent:
     """
     Build the multilingual farmer assistant pipeline.
     """
+    configure_google_api()
     gemini_model = model or get_gemini_model()
     translation_tool = FunctionTool(func=translate_text)
 

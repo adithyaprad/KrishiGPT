@@ -7,9 +7,9 @@ from typing import Any, Dict
 from google.adk.agents.llm_agent import LlmAgent
 from google.adk.tools import FunctionTool
 
-from krishigpt.tools.location import get_lat_lon
-from krishigpt.tools.sarvam import use_sarvam_llm
-from krishigpt.tools.weather import get_weather_forecast
+from ..tools.location import get_lat_lon
+from ..tools.sarvam import use_sarvam_llm
+from ..tools.weather import get_weather_forecast
 
 logger = logging.getLogger(__name__)
 

@@ -7,7 +7,7 @@ from typing import Any, Dict, Optional
 
 import requests
 
-from krishigpt.config import get_openweather_api_key
+from ..config import get_openweather_api_key
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,9 @@ def get_lat_lon(
     """
     Fetch latitude and longitude for a given location using OpenWeatherMap API.
     """
-    resolved_api_key = api_key or get_openweather_api_key()
+    resolved_api_key = get_openweather_api_key()
+    if api_key and api_key != resolved_api_key:
+        logger.warning("Ignoring provided OpenWeather API key; using .env value.")
     if not resolved_api_key:
         return {
             "status": "error",
